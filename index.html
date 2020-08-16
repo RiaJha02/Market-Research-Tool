@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+    <head>
+        <title>HomePage</title>
+        <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+            
+            async function getapi1()
+            {
+                let response = await fetch("https://market-research-tool.bubbleapps.io/api/1.1/obj/user");
+                let res = await response.json();
+                return res;
+            }
+            getapi1().then(res => useArr(res));
+
+            var applicantUser = [];
+
+            function useArr(obj)
+            {
+                let data = obj.response.results;
+                for(var key in data)
+                {
+                    var user = { Topics : [], Locations : [], age : '', malep: '', femalep: '', id: '' };
+                    if(data[key].Type == 'influencer')
+                    {
+                        data[key].Topics.forEach(element => {
+                            user.Topics.push(element);
+                        });
+
+                        data[key].Locations.forEach(element => {
+                            user.Locations.push(element);
+                        });
+
+                        user.age = data[key].age;
+
+                        user.malep = data[key].malep;
+
+                        user.femalep = data[key].femalep;
+
+                        user.id = data[key]._id;
+
+                        applicantUser.push(user);
+                    }
+                }
+            }
+
+            var pathArray = window.location.pathname.split('=');
+            var projid = pathArray[1];
+            var url = "https://market-research-tool.bubbleapps.io/api/1.1/obj/project" + projid;
+            var urlfin = 'https://market-research-tool.bubbleapps.io/project_details/' + projid;
+
+            async function getapi2(){
+                let response = await fetch(url);
+                let res = await response.json();
+                return res;
+            }
+            getapi2().then(res => setData(res.response,applicantUser));
+
+            var Score_id = [];
+
+            function setData(obj, res2){
+                var res1 = [];
+                var score = 0;
+                var ans = [];
+
+                res1.push(obj.Location);
+                res1.push(obj.Gender);
+                res1.push(obj.Age);
+                res1.push(obj.Topic);
+
+                // console.log(res1);
+                // console.log(res2);
+                
+                for(var i = 0; i  < res2.length; i++)
+                {
+                    res2[i].Locations.forEach(element => {
+                        if(element == res1.Location)
+                            score = score + 100;
+                    });
+
+                    if((res1.Gender == 1 && res2[i].malep >= 50) || (res1.Gender == 2 && res2[i].femalep >= 50))
+                        score = score + 100;
+
+                    if(((res1.Age - res2[i].age) <= 5) || ((res2[i].age - res1.Age) <= 5))
+                        score = score + 100;
+
+                    res2[i].Topics.forEach(element => {
+                        if(element == res1.Topic)
+                            score = score + 100;
+                    });
+
+                    if(score > 0)
+                    {
+                        var id = res2[i].id;
+                        Score_id.push({score,id});
+                    }
+                }
+
+                Score_id.sort();
+
+                for(var i = 0; i < Score_id.length; i++)
+                    ans.push(Score_id[i].id);
+
+                console.log(Score_id);
+                //console.log(ans);
+
+                fetch(url, {
+                    method: 'PATCH',
+                    data: {
+                        'applicants': ans
+                    }
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Loading...</h1>
+        <button><a href="https://market-research-tool.bubbleapps.io/o_dashboard">Click to proceed</a></button>
+    </body>
+</html>
