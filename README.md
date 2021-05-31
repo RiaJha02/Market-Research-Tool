@@ -9,5 +9,7 @@ Know more at: https://docs.google.com/document/d/1nhG4k-wD4QJ-SwQHWYl7M2IMM7ywep
 Also check out: https://devpost.com/software/market-influence
 
 For collaboration, contact:
+
 Anujj Prem - https://www.linkedin.com/in/anujj-prem-b113441aa/
+
 Ria Jha - https://www.linkedin.com/in/ria-jha-17917315a/
